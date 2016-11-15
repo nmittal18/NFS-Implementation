@@ -1,0 +1,138 @@
+// Copyright 2015, Google Inc.
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are
+// met:
+//
+//     * Redistributions of source code must retain the above copyright
+// notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above
+// copyright notice, this list of conditions and the following disclaimer
+// in the documentation and/or other materials provided with the
+// distribution.
+//     * Neither the name of Google Inc. nor the names of its
+// contributors may be used to endorse or promote products derived from
+// this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+// OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+// LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "io.grpc.examples.nfs";
+option java_outer_classname = "NfsProto";
+option objc_class_prefix = "HLW";
+
+package nfs;
+
+// The communication service definition.
+service communication {
+
+
+  rpc sendRequest (Request) returns (Response) {}
+  rpc readRequest (Request) returns (stream readDataResponse) {}
+  rpc writeRequest (stream writeDataRequest) returns (Response) {}
+
+}
+
+message fileHandle {
+  uint32 volumeID = 1;
+  uint32 inodeNo = 2;
+  uint32 generationNum = 3;
+}
+
+message Stat {
+  uint32 sta_dev = 1;
+  uint32 sta_ino = 2;
+  uint32 sta_mode = 3;
+  uint32 sta_nlink = 4;
+  uint32 sta_uid = 5;
+  uint32 sta_gid = 6;
+  uint32 sta_rdev = 7;
+  uint64 sta_size = 8;
+  uint32 sta_blksize = 9; //Couldn't find exact size of int
+  uint64 sta_blocks = 10;
+  int32 sta_atime = 11;
+  int32 sta_mtime = 12;
+  int32 sta_ctime = 13;
+}
+message Statfs {
+ uint32 f_bsize = 1;
+  uint32 f_frsize = 2;
+  uint32 f_blocks = 3;
+  uint32 f_bfree = 4;
+  uint32 f_bavail = 5;
+  uint32 f_files = 6;
+  uint32 f_ffree = 7;
+  uint64 f_favail = 8;
+  int64 f_fsid = 9; //Couldn't find exact size of int
+  int64 f_flag = 10;
+  int64 f_namemax = 11;
+
+}
+
+// The request message containing the user's name.
+message Request {
+  string commandName = 1;
+  fileHandle fh = 2;
+  string name = 3; //name to look for in parent directory
+  Stat attr = 4;
+  int32 offset = 5;
+  int32 count = 6;
+  int32 username = 7;
+  fileHandle fh2 =8;
+  string name2 = 9;
+}
+
+// The response message containing the greetings
+message Response {
+  string commandName = 1;
+  Stat attr = 2;
+  int32 status = 3;
+  fileHandle fh = 4;
+  int32 username = 5;
+  string errorMsg = 6;
+  Statfs filestatus = 7;
+  int32 err=8;
+  int32 grpc_error_code=9;
+}
+
+// The response message containing the greetings
+message writeDataRequest {
+  string commandName = 1;
+  fileHandle fh = 2;
+  int32 offset = 3;
+  int32 count = 4;
+  string data = 5;
+  int32 username = 6;
+}
+
+
+// The response message containing the greetings
+message readDataResponse {
+  string commandName = 1;
+  Stat attr = 2;
+  int32 status= 3;
+  string data = 4;
+  int32 username = 5;
+  string errorMsg = 6;
+  int32 err=7;
+  int32 grpc_error_code=8;
+}
+
+
+//option java_package = "ex.grpc";
+//option objc_class_prefix = "HSW";
+
+
